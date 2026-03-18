@@ -10,7 +10,7 @@ const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
-  1000
+  2000
 );
 
 // RENDER
@@ -19,69 +19,45 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // LUCES
-scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+scene.add(new THREE.AmbientLight(0xffffff, 1));
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(10, 20, 10);
+light.position.set(50, 100, 50);
 scene.add(light);
 
-// SUELO
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(200, 200),
-  new THREE.MeshStandardMaterial({ color: 0x228b22 })
-);
-ground.rotation.x = -Math.PI / 2;
-scene.add(ground);
-
-// CARRETERA
-const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x222222 });
-
-const road1 = new THREE.Mesh(
-  new THREE.BoxGeometry(20, 0.1, 100),
-  roadMaterial
-);
-scene.add(road1);
-
-const curve = new THREE.Mesh(
-  new THREE.BoxGeometry(20, 0.1, 50),
-  roadMaterial
-);
-curve.position.set(25, 0, -25);
-curve.rotation.y = Math.PI / 4;
-scene.add(curve);
-
-const road2 = new THREE.Mesh(
-  new THREE.BoxGeometry(20, 0.1, 80),
-  roadMaterial
-);
-road2.position.set(50, 0, -60);
-road2.rotation.y = Math.PI / 4;
-scene.add(road2);
-
-// 🚗 GRUPO DEL COCHE
+// 🚗 COCHE
 let carGroup = new THREE.Group();
 scene.add(carGroup);
 
-let car;
 let speed = 0;
 
-// CONFIG
-let maxSpeed = 0.5;
-let acceleration = 0.01;
-let deceleration = 0.02;
-let turnSpeed = 0.04;
-
-// CARGAR MODELO
 const loader = new GLTFLoader();
-loader.load('/car.glb', function (gltf) {
-  car = gltf.scene;
 
-  car.scale.set(3, 3, 3);
-  car.position.y = 0.5;
+// CARGAR COCHE
+loader.load('/car.glb', (gltf) => {
+  const car = gltf.scene;
 
+  car.scale.set(2, 2, 2);
+  car.position.y = 1;
   car.rotation.y = Math.PI / 2;
 
   carGroup.add(car);
+});
+
+// 🛣️ CARGAR TRACK (EL NUEVO)
+loader.load('/track.glb', (gltf) => {
+
+  const track = gltf.scene;
+
+  console.log("TRACK CARGADO:", track);
+
+  // 🔥 Ajusta tamaño si hace falta
+  track.scale.set(5, 5, 5);
+
+  // 🔥 Ajusta posición si no coincide
+  track.position.set(0, 0, 0);
+
+  scene.add(track);
 });
 
 // CONTROLES
@@ -95,10 +71,17 @@ window.addEventListener('keyup', (e) => {
   keys[e.key.toLowerCase()] = false;
 });
 
-// ANIMACIÓN
+// CONFIG MOVIMIENTO
+let maxSpeed = 0.5;
+let acceleration = 0.01;
+let deceleration = 0.02;
+let turnSpeed = 0.04;
+
+// LOOP
 function animate() {
   requestAnimationFrame(animate);
 
+  // MOVIMIENTO
   if (keys['arrowup']) speed += acceleration;
   if (keys['arrowdown']) speed -= acceleration;
 
@@ -115,13 +98,13 @@ function animate() {
   carGroup.position.x += Math.sin(carGroup.rotation.y) * speed;
   carGroup.position.z += Math.cos(carGroup.rotation.y) * speed;
 
-  // 🎥 CÁMARA MÁS LEJOS (AQUÍ EL CAMBIO)
-  const offset = new THREE.Vector3(0, 7, -20);
+  // 🎥 CÁMARA
+  const offset = new THREE.Vector3(0, 15, -30);
   offset.applyMatrix4(carGroup.matrixWorld);
 
   camera.position.lerp(offset, 0.08);
 
-  const lookAt = new THREE.Vector3(0, 2, 5);
+  const lookAt = new THREE.Vector3(0, 5, 10);
   lookAt.applyMatrix4(carGroup.matrixWorld);
 
   camera.lookAt(lookAt);
