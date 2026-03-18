@@ -25,9 +25,13 @@ const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(50, 100, 50);
 scene.add(light);
 
-// 🚗 COCHE
+// 🚗 GRUPO MOVIMIENTO
 let carGroup = new THREE.Group();
 scene.add(carGroup);
+
+// 🚗 VISUAL
+let carVisual = new THREE.Group();
+carGroup.add(carVisual);
 
 let speed = 0;
 
@@ -39,22 +43,18 @@ loader.load('/car.glb', (gltf) => {
 
   car.scale.set(2, 2, 2);
   car.position.y = 1;
-  car.rotation.y = Math.PI / 2;
 
-  carGroup.add(car);
+  // 🔥 ROTACIÓN FINAL CORRECTA
+  car.rotation.y = -Math.PI / 2;
+
+  carVisual.add(car);
 });
 
-// 🛣️ CARGAR TRACK (EL NUEVO)
+// TRACK
 loader.load('/track.glb', (gltf) => {
-
   const track = gltf.scene;
 
-  console.log("TRACK CARGADO:", track);
-
-  // 🔥 Ajusta tamaño si hace falta
   track.scale.set(5, 5, 5);
-
-  // 🔥 Ajusta posición si no coincide
   track.position.set(0, 0, 0);
 
   scene.add(track);
@@ -71,7 +71,7 @@ window.addEventListener('keyup', (e) => {
   keys[e.key.toLowerCase()] = false;
 });
 
-// CONFIG MOVIMIENTO
+// CONFIG
 let maxSpeed = 0.5;
 let acceleration = 0.01;
 let deceleration = 0.02;
@@ -81,7 +81,6 @@ let turnSpeed = 0.04;
 function animate() {
   requestAnimationFrame(animate);
 
-  // MOVIMIENTO
   if (keys['arrowup']) speed += acceleration;
   if (keys['arrowdown']) speed -= acceleration;
 
@@ -98,16 +97,14 @@ function animate() {
   carGroup.position.x += Math.sin(carGroup.rotation.y) * speed;
   carGroup.position.z += Math.cos(carGroup.rotation.y) * speed;
 
-  // 🎥 CÁMARA
-  const offset = new THREE.Vector3(0, 15, -30);
-  offset.applyMatrix4(carGroup.matrixWorld);
+  // 🎥 CÁMARA CINEMÁTICA
+  const offset = new THREE.Vector3(0, 6, -15);
+  offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), carGroup.rotation.y);
 
-  camera.position.lerp(offset, 0.08);
+  const targetPos = carGroup.position.clone().add(offset);
 
-  const lookAt = new THREE.Vector3(0, 5, 10);
-  lookAt.applyMatrix4(carGroup.matrixWorld);
-
-  camera.lookAt(lookAt);
+  camera.position.lerp(targetPos, 0.08);
+  camera.lookAt(carGroup.position.clone().add(new THREE.Vector3(0, 2, 0)));
 
   renderer.render(scene, camera);
 }
