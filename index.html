@@ -76,8 +76,8 @@ let drift = 0;
 
 const loader = new GLTFLoader();
 
-// 🚗 IMPORTANTE → rutas con /juego_coche/
-loader.load('/juego_coche/car.glb', (gltf) => {
+// 🚗 MODELOS (RUTAS CORREGIDAS)
+loader.load('./public/car.glb', (gltf) => {
   const car = gltf.scene;
   car.scale.set(2, 2, 2);
   car.position.y = 1;
@@ -85,13 +85,13 @@ loader.load('/juego_coche/car.glb', (gltf) => {
   carVisual.add(car);
 });
 
-loader.load('/juego_coche/track.glb', (gltf) => {
+loader.load('./public/track.glb', (gltf) => {
   const track = gltf.scene;
   track.scale.set(5, 5, 5);
   scene.add(track);
 });
 
-loader.load('/juego_coche/traffic.glb', (gltf) => {
+loader.load('./public/traffic.glb', (gltf) => {
   const traffic = gltf.scene;
   traffic.scale.set(0.12, 0.12, 0.12);
   traffic.position.set(2, 0, -2);
