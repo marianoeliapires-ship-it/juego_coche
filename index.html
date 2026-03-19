@@ -19,12 +19,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87ceeb);
 
 // CÁMARA
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  2000
-);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
 
 // RENDER
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -76,7 +71,7 @@ let drift = 0;
 
 const loader = new GLTFLoader();
 
-// 🚗 MODELOS (RUTAS CORREGIDAS)
+// 🚗 MODELOS (RUTA CORRECTA)
 loader.load('./public/car.glb', (gltf) => {
   const car = gltf.scene;
   car.scale.set(2, 2, 2);
