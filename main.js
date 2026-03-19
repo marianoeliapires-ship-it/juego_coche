@@ -18,7 +18,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// 🟢 UI (ARREGLADO)
+// UI
 const ui = document.createElement('div');
 ui.style.position = 'absolute';
 ui.style.top = '20px';
@@ -64,7 +64,7 @@ let drift = 0;
 const loader = new GLTFLoader();
 
 // 🚗 COCHE
-loader.load('/car.glb', (gltf) => {
+loader.load('public/car.glb', (gltf) => {
   const car = gltf.scene;
   car.scale.set(2, 2, 2);
   car.position.y = 1;
@@ -73,14 +73,14 @@ loader.load('/car.glb', (gltf) => {
 });
 
 // 🛣️ TRACK
-loader.load('/track.glb', (gltf) => {
+loader.load('public/track.glb', (gltf) => {
   const track = gltf.scene;
   track.scale.set(5, 5, 5);
   scene.add(track);
 });
 
 // 🚦 SEMÁFORO
-loader.load('/traffic.glb', (gltf) => {
+loader.load('public/traffic.glb', (gltf) => {
   const traffic = gltf.scene;
   traffic.scale.set(0.12, 0.12, 0.12);
   traffic.position.set(2, 0, -2);
@@ -139,7 +139,6 @@ button.onclick = () => {
 function animate() {
   requestAnimationFrame(animate);
 
-  // MOVIMIENTO
   if (keys['arrowup']) speed += 0.01;
   if (keys['arrowdown']) speed -= 0.01;
 
@@ -155,12 +154,10 @@ function animate() {
   carGroup.position.x += Math.sin(carGroup.rotation.y) * speed;
   carGroup.position.z += Math.cos(carGroup.rotation.y) * speed;
 
-  // ⏱ INICIO
   if (startTime === null && Math.abs(speed) > 0.01) {
     startTime = Date.now();
   }
 
-  // 🏁 VUELTAS
   if (finishBox.containsPoint(carGroup.position)) {
     if (canCountLap) {
       laps++;
@@ -174,7 +171,6 @@ function animate() {
     canCountLap = true;
   }
 
-  // 🟢 UI ACTUALIZADA
   if (finalTime === null) {
     let t = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
     ui.innerText = `Vuelta: ${laps} | Tiempo: ${t}s`;
@@ -182,7 +178,6 @@ function animate() {
     ui.innerText = `🏆 GANASTE en ${finalTime}s`;
   }
 
-  // 🎥 CÁMARA
   const offset = new THREE.Vector3(0, 16, -32);
   offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), carGroup.rotation.y);
 
